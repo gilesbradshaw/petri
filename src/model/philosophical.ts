@@ -2,7 +2,7 @@ import Model from './Model'
 
 const model: Model = {
   label: 'PetriNet Model PhiloDilemma\nExtracted from ConceptBase and layed out by Graphviz ',
-  nodes: [
+  places: [
     "hu3",
     "th3",
     "ri3",
@@ -27,7 +27,7 @@ const model: Model = {
     "rel1",
     "acq1",
   ],
-  edges: [
+  arcs: [
     ["ri3", "acq2"],
     ["ri3", "acq3"],
     ["hu3", "acq3"],

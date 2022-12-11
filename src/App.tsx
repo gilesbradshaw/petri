@@ -1,32 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Graphviz } from 'graphviz-react';
-import initModel from './model/dining-2'
+
+import {ErrorBoundary} from 'react-error-boundary'
+import Model from './model/Model'
 import dot from './dot'
 import process from './dot/process'
+import { Exception } from './Exception'
+ 
 
-function App() {
-  const [model, setModel] = useState(initModel);
-  const [edge, setEdge] = useState('black');
+function ErrorFallback({error, resetErrorBoundary}: { error: Exception, resetErrorBoundary: () => void}) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>reset model</button>
+    </div>
+  )
+}
+
+function Ui({ model, name }: { model: Model, name: string }) {
+  return <ErrorBoundary
+    FallbackComponent={ErrorFallback}
+    onReset={() => {
+      localStorage.setItem(`model:${name}`, JSON.stringify(model))
+    }}
+    >
+      <App
+        model={model}
+        name={name}
+      />
+    </ErrorBoundary>
+}
+function App({ model, name }: { model: Model, name: string }) {
+  const modelString = localStorage.getItem(`model:${name}`)
+  const [myModel, setModel] = useState<Model>(
+    modelString ? JSON.parse(modelString) : model);
+  const set = (model: Model) => {
+    localStorage.setItem(`model:${name}`, JSON.stringify(model))
+    setModel(model)
+  }
   useEffect(() => {
-    const listeners = model
+    const listeners = myModel
       .transitions
       .map(
         transition => ({
           id: `#transition-${transition}`,
           click: () => {
-            if (model.states.find(state => state === transition)) {
-              setModel({
-                ...model,
-                states: model.states.filter(state => state !== transition),
+            if (myModel.states.find(state => state === transition)) {
+              set({
+                ...myModel,
+                states: myModel.states.filter(state => state !== transition),
               })
             } else {
-              setModel(
+              set(
                 process(
                   {
-                    ...model,
-                    states: [...model.states, transition],
+                    ...myModel,
+                    states: [...myModel.states, transition],
                   }
                 )
               )
@@ -42,23 +73,23 @@ function App() {
         }) => document.querySelector(id)
           ?.addEventListener('click', click)
       )
-    const nodeListeners = model
-      .nodes
+    const nodeListeners = myModel
+      .places
       .map(
-        node => ({
-          id: `#node-${node}`,
+        place => ({
+          id: `#node-${place}`,
           click: () => {
-            if (model.markers.find(marker => marker === node)) {
-              setModel({
-                ...model,
-                markers: model.markers.filter(marker => marker !== node),
+            if (myModel.markers.find(marker => marker === place)) {
+              set({
+                ...myModel,
+                markers: myModel.markers.filter(marker => marker !== place),
               })
             } else {
-              setModel(
+              set(
                 process(
                   {
-                    ...model,
-                    markers: [...model.markers, node],
+                    ...myModel,
+                    markers: [...myModel.markers, place],
                   }
                 )
               )
@@ -85,13 +116,12 @@ function App() {
         )
     }
   })
-console.log(model.markers)
   return (
     <div className="App">
       <header className="App-header">
         <Graphviz
           className='digraph'
-          dot={dot(model)}
+          dot={dot(myModel)}
           options={{
             fit: true,
             height: 600,
@@ -100,41 +130,13 @@ console.log(model.markers)
           }}
         />
       </header>
+      <button
+        onClick={() => setModel(model)}
+      >
+        reset
+      </button>
     </div>
   );
 }
 
-export default App;
-
-/*
-`
-          digraph TrafficLights {
-            fontname="Helvetica,Arial,sans-serif"
-            node [fontname="Helvetica,Arial,sans-serif"]
-            edge [fontname="Helvetica,Arial,sans-serif"]
-            layout = neato
-            node [shape=box];  gy2; yr2; rg2; gy1; yr1; rg1;
-            node [shape=circle,fixedsize=true,width=0.9];  green2; yellow2; red2; safe2; safe1; green1; yellow1; red1;
-            gy2->yellow2 [id="edge-gy2-yellow2", style=${edgeHover}, color=${edge}];
-            rg2->green2;
-            yr2->safe1;
-            yr2->red2;
-            safe2->rg2;
-            green2->gy2;
-            yellow2->yr2;
-            red2->rg2;
-            gy1->yellow1;
-            rg1->green1;
-            yr1->safe2;
-            yr1->red1;
-            safe1->rg1;
-            green1->gy1;
-            yellow1->yr1;
-            red1->rg1;
-            
-            overlap=false
-            label="PetriNet Model TrafficLights\nExtracted from ConceptBase and layed out by Graphviz"
-            fontsize=12;
-            }
-          `*/
-
+export default Ui;

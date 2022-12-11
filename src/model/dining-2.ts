@@ -2,7 +2,7 @@ import Model from './Model'
 
 const model: Model = {
   label: 'Two philosopher dining',
-  nodes: [
+  places: [
     "fork_1_free",
     "fork_2_free",
     "left_hand_empty_1",
@@ -36,7 +36,7 @@ const model: Model = {
     "start_eating_2",
     "start_thinking_2",
   ],
-  edges: [
+  arcs: [
     ["put_left_fork_1", "fork_1_free"], //
     ["fork_1_free", "take_left_fork_1"], //
     ["put_left_fork_1", "left_hand_empty_1"],

@@ -10,7 +10,7 @@ const model: Model = {
     'yr1',
     
   ],
-  nodes: [
+  places: [
     'green1',
     'yellow1',
     'red1',
@@ -20,7 +20,7 @@ const model: Model = {
     'red2',
     'safe2',
   ],
-  edges: [
+  arcs: [
     ['gy2', 'yellow2'],
     ['rg2', 'green2'],
     ['yr2', 'safe1'],

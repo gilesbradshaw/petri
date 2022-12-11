@@ -7,14 +7,14 @@ interface ModelRet extends Model {
 const process = (model: Model): Model => {
   const newModel: ModelRet = model.states.reduce<ModelRet>((acc, state) => {
     const tos = acc
-        .edges
+        .arcs
         .filter(
           ([ from ]) => from === state)
         .map(([_, to]) => to)
       // all destinations free
-      if (!tos.find(node => model.markers.find(marker => marker === node))) {
+      if (true || !tos.find(node => model.markers.find(marker => marker === node))) {
         const froms = acc
-          .edges
+          .arcs
           .filter(
             ([ _, to ]) => to === state)
           .map(([from]) => from)

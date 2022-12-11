@@ -1,7 +1,7 @@
 import Model from '../model/Model';
 import node from './node'
 import transition from './transition'
-import edge from './edge'
+import arc from './arc'
 
 export default (model: Model) => `
 digraph {
@@ -12,8 +12,8 @@ digraph {
   node [shape=box];
   ${model.transitions.map(transition(model.states)).join(';')}
   node [shape=circle,fixedsize=true,width=0.9];
-  ${model.nodes.map(node(model.markers)).join(';')}
-  ${model.edges.map(edge).join('\n')}
+  ${model.places.map(node(model.markers)).join(';')}
+  ${model.arcs.map(arc).join('\n')}
   
   overlap=false
   label="${model.label}"
