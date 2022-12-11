@@ -36,3 +36,16 @@
     transform: rotate(360deg);
   }
 }
+
+.transition {
+  cursor: pointer;
+}
+
+.digraph {
+  background-color: green;
+}
+g {
+  fill: azure;
+  background-color: green;
+  color: red;
+}
